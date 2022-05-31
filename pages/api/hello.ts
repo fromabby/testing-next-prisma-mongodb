@@ -6,20 +6,19 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
-    const { id } = await prisma.discord.create({
+    const { id } = await prisma.user.create({
         data: {
-            username: 'Myoui',
-            tag: '1234',
-            user: { create: { nearId: 'abby' } },
+            nearId: 'abby',
+            discord: {
+                username: 'Myoui',
+                tag: '1234',
+            },
         },
     })
 
-    const result = await prisma.discord.findUnique({
+    const result = await prisma.user.findUnique({
         where: {
             id,
-        },
-        include: {
-            user: true,
         },
     })
 
