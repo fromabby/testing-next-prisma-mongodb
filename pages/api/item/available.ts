@@ -2,18 +2,20 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '../../../lib/prisma'
 
-// POST new ticket -> /api/ticket/new
+// GET ALL AVAILABLE ITEMS -> /api/item/available
 export default async function handle(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
     try {
-        const { id } = await prisma.ticket.create({
-            data: { ...req.body },
+        const items = await prisma.item.findMany({
+            where: {
+                isAvailable: true,
+            },
         })
 
-        res.status(200).json(id)
+        res.status(200).json(items)
     } catch (error) {
-        res.status(500).json({ error: 'Cant create new ticket' })
+        res.status(500).json({ error: 'Cannot get available items' })
     }
 }

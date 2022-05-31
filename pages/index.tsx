@@ -1,55 +1,89 @@
-import type { NextPage, GetServerSideProps } from 'next'
+import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
-import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import { useState } from 'react'
+import { useMemo, useEffect, useState, SyntheticEvent } from 'react'
 import axios from 'axios'
+import useSWR from 'swr'
+import { User, Ticket, Item } from '../types'
 
-// export const getServerSideProps: GetServerSideProps = async (context) => {
-//     const res = await fetch(`http://localhost:3000/api/hello`)
-//     const data = await res.json()
-//     return { props: { ...data } }
-//   }
+interface Result {
+    user: User
+    ticket: Ticket
+    item: Item
+}
 
-const Home: NextPage = (props) => {
-    const [user, setUser] = useState({
-        id: '',
-        nearId: '',
-        discord: { username: '', tag: '' },
+const Home = ({ items: itemlist }: any) => {
+    // states
+    const [userId, setUserId] = useState('')
+    const [ticketId, setTicketId] = useState('')
+
+    const { data: ticketlist, isValidating: ticketsloading } = useSWR(
+        `http://localhost:3000/api/ticket/user/${userId}`
+    )
+    const { data: userlist, isValidating: usersloading } = useSWR<User[]>(
+        `http://localhost:3000/api/ticket/user`
+    )
+
+    const [tickets, setTickets] = useState<Ticket[]>()
+    const [items, setItems] = useState<Item[]>(itemlist)
+    const [users, setUsers] = useState<User[]>()
+
+    const [results, setResults] = useState<Result>({
+        user: {
+            id: '',
+            nearId: '',
+            discord: {
+                username: '',
+                tag: '',
+            },
+        },
+        ticket: {
+            id: '',
+            ticketName: '',
+            ticketNumber: 0,
+            isMinted: true,
+            userId: '',
+        },
+        item: {
+            id: '',
+            shySkullId: 0,
+            rarity: '',
+            isAvailable: false,
+        },
     })
 
-    // const [user, setUser] = useState(props)
+    useEffect(() => {
+        !usersloading && userlist && setUsers(userlist)
+    }, [userlist, usersloading])
 
-    const [users, setUsers] = useState([])
-    const getUser = async () => {
-        try {
-            const userId = '6295e451fbceed3afc0587fe'
-            const ticketId = '6295f4e923dedf500e3f122c'
-            const itemId = '6295fdae12b2ef36e2d0c4e3'
+    useEffect(() => {
+        !ticketsloading && ticketlist && setTickets(ticketlist)
+    }, [ticketlist, ticketsloading])
 
-            // ! randomizer
-            // const { data } = await axios.get(
-            //     `http://localhost:3000/api/randomizer/${itemId}/${userId}/${ticketId}`
-            // )
+    const randomize = async (e: SyntheticEvent) => {
+        e.preventDefault()
+        if (items.length === 0) return
 
-            // ! create item
-            // const { data } = await axios.post(
-            //     `http://localhost:3000/api/item/new`,
-            //     {
-            //         shySkullId: 3,
-            //         rarity: 'N36',
-            //     }
-            // )
+        const len = items.length - 1
+        const idx = len === 1 ? 0 : Math.ceil(Math.random() * len + 0)
 
-            // ! get available tickets
-            const { data } = await axios.get(
-                `http://localhost:3000/api/ticket/user/${userId}`
-            )
+        const itemId = items[idx].id
 
-            console.log(data)
-        } catch (error) {
-            window.alert('duplicate!')
-        }
+        const { data } = await axios.get(
+            `http://localhost:3000/api/randomizer/${itemId}/${userId}/${ticketId}`
+        )
+
+        updateData(itemId, ticketId)
+        setResults(data)
+    }
+
+    const updateData = (itemId: string, ticketId: string) => {
+        // available items
+        const uItems = items.filter((item) => item.id !== itemId)
+        setItems(uItems)
+        // available tickets
+        const uTickets = tickets?.filter((ticket) => ticket.id !== ticketId)
+        setTickets(uTickets)
     }
 
     return (
@@ -62,96 +96,95 @@ const Home: NextPage = (props) => {
                 />
                 <link rel='icon' href='/favicon.ico' />
             </Head>
-
-            <main className={styles.main}>
-                <div>
-                    {/* {user && (
-                        <>
-                            <p>{user.id}</p>
-                            <p>{user.nearId}</p>
-                            <p>{user.discord.username}</p>
-                            <p>{user.discord.tag}</p>
-                        </>
-                    )} */}
-                    <select style={{ width: '100px' }} required>
-                        <option>-</option>
-                        {users &&
-                            users.map((user) => (
-                                <option key={user.id} value={user.id}>
-                                    {user.nearId}
-                                </option>
-                            ))}
-                    </select>
-                    <button onClick={getUser}>Get Users</button>
-                </div>
-                <h1 className={styles.title}>
-                    Welcome to <a href='https://nextjs.org'>Next.js!</a>
-                </h1>
-
-                <p className={styles.description}>
-                    Get started by editing{' '}
-                    <code className={styles.code}>pages/index.tsx</code>
-                </p>
-
+            <form className={styles.main} onSubmit={randomize}>
+                <h1 className={styles.title}>Randomizer!</h1>
                 <div className={styles.grid}>
-                    <a href='https://nextjs.org/docs' className={styles.card}>
-                        <h2>Documentation &rarr;</h2>
-                        <p>
-                            Find in-depth information about Next.js features and
-                            API.
-                        </p>
+                    <ItemList items={items} />
+
+                    <a className={styles.card}>
+                        <h2>Select User</h2>
+                        <select
+                            value={userId}
+                            onChange={(e) => setUserId(e.target.value)}
+                            required={true}
+                        >
+                            <option></option>
+                            {!usersloading && <UserList users={users} />}
+                        </select>
                     </a>
 
-                    <a href='https://nextjs.org/learn' className={styles.card}>
-                        <h2>Learn &rarr;</h2>
-                        <p>
-                            Learn about Next.js in an interactive course with
-                            quizzes!
-                        </p>
+                    <a className={styles.card}>
+                        <h2>Select Ticket</h2>
+                        <select
+                            value={ticketId}
+                            onChange={(e) => setTicketId(e.target.value)}
+                            required={true}
+                        >
+                            <option></option>
+                            {!ticketsloading && (
+                                <TicketList tickets={tickets} />
+                            )}
+                        </select>
                     </a>
 
-                    <a
-                        href='https://github.com/vercel/next.js/tree/canary/examples'
-                        className={styles.card}
-                    >
-                        <h2>Examples &rarr;</h2>
-                        <p>
-                            Discover and deploy boilerplate example Next.js
-                            projects.
-                        </p>
-                    </a>
-
-                    <a
-                        href='https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app'
-                        className={styles.card}
-                    >
-                        <h2>Deploy &rarr;</h2>
-                        <p>
-                            Instantly deploy your Next.js site to a public URL
-                            with Vercel.
-                        </p>
-                    </a>
+                    <button type='submit' disabled={items.length === 0}>
+                        Randomize!
+                    </button>
+                    {results && <Results results={results} />}
                 </div>
-            </main>
-
-            <footer className={styles.footer}>
-                <a
-                    href='https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app'
-                    target='_blank'
-                    rel='noopener noreferrer'
-                >
-                    Powered by{' '}
-                    <span className={styles.logo}>
-                        <Image
-                            src='/vercel.svg'
-                            alt='Vercel Logo'
-                            width={72}
-                            height={16}
-                        />
-                    </span>
-                </a>
-            </footer>
+            </form>
         </div>
+    )
+}
+
+export const getServerSideProps: GetServerSideProps = async () => {
+    const { data } = await axios(`http://localhost:3000/api/item/available`)
+    return { props: { items: data } }
+}
+
+const ItemList = ({ items }: any) => {
+    return (
+        <a className={styles.card}>
+            <h2>Available items</h2>
+            {items && items.map((item: Item) => <p>{item.shySkullId}</p>)}
+        </a>
+    )
+}
+
+const UserList = ({ users }: any) => {
+    return (
+        <>
+            {users &&
+                users.map((user: User) => (
+                    <option value={user.id}>{user.nearId}</option>
+                ))}
+        </>
+    )
+}
+
+const TicketList = ({ tickets }: any) => {
+    return (
+        <>
+            {tickets &&
+                tickets.map((ticket: Ticket) => (
+                    <option value={ticket.id} disabled={ticket.isMinted}>
+                        {ticket.ticketNumber}
+                    </option>
+                ))}
+        </>
+    )
+}
+
+const Results = ({ results }: any) => {
+    return (
+        <a className={styles.card}>
+            <h2>Results</h2>
+            <p>{results.user.nearId}</p>
+            <p>{results.ticket.ticketName}</p>
+            <p>
+                {results.item.shySkullId} {results.item.rarity}
+            </p>
+        </a>
     )
 }
 

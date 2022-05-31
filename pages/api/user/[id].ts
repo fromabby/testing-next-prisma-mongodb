@@ -14,6 +14,9 @@ export default async function handle(
             where: {
                 id: userId,
             },
+            include: {
+                tickets: true,
+            },
         })
 
         res.status(200).json(user)

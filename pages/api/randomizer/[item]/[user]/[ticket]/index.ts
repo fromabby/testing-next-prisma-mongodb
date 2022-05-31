@@ -40,7 +40,7 @@ export default async function handle(
                 id: itemId,
             },
             data: {
-                isAvailable: !item.isAvailable,
+                isAvailable: !item?.isAvailable,
                 mintDate: new Date(Date.now()),
                 userId,
             },
@@ -51,7 +51,7 @@ export default async function handle(
                 id: ticketId,
             },
             data: {
-                isMinted: !ticket.isMinted,
+                isMinted: !ticket?.isMinted,
                 mintDate: new Date(Date.now()),
                 userId,
             },
@@ -67,7 +67,11 @@ export default async function handle(
             },
         })
 
-        res.status(200).json(user)
+        res.status(200).json({
+            user,
+            item,
+            ticket,
+        })
     } catch (error) {
         res.status(500).json({ error: 'Cannot get all users' })
     }

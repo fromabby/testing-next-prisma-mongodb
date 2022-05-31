@@ -8,18 +8,18 @@ export default async function handle(
     res: NextApiResponse
 ) {
     try {
-        const tickets = await prisma.user.findMany({
-            where: {
-                NOT: {
-                    // user has no tickets
-                    tickets: {
-                        none: {}, // that are none
+        let tickets = await prisma.user.findMany({
+            include: {
+                tickets: {
+                    where: {
+                        isMinted: false,
                     },
                 },
             },
         })
 
-        res.status(200).json(tickets)
+        const users = tickets.filter((user) => user.tickets.length !== 0)
+        res.status(200).json(users)
     } catch (error) {
         res.status(500).json({ error: 'Cannot get all users with tickets' })
     }

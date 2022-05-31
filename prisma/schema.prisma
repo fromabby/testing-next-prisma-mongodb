@@ -46,7 +46,7 @@ type Discord {
 model Ticket {
     id           String    @id @default(auto()) @map("_id") @db.ObjectId
     ticketName   String
-    ticketNumber Int
+    ticketNumber Int       @unique
     isMinted     Boolean   @default(false)
     mintDate     DateTime?
     user         User      @relation(fields: [userId], references: [id])
@@ -59,8 +59,8 @@ model Ticket {
 // zero or ONE User
 model Item {
     id          String    @id @default(auto()) @map("_id") @db.ObjectId
-    shySkullId  Int
-    rarity      String
+    shySkullId  Int       @unique
+    rarity      String    @unique
     isAvailable Boolean   @default(true)
     mintDate    DateTime?
     user        User?     @relation(fields: [userId], references: [id])

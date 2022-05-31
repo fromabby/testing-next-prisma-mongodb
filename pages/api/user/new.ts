@@ -9,13 +9,16 @@ export default async function handle(
 ) {
     const { nearId, discord, tickets } = req.body
     const { username, tag } = discord
+
     try {
         const { id } = await prisma.user.create({
             data: {
                 nearId,
                 discord: {
-                    username,
-                    tag,
+                    set: {
+                        username,
+                        tag,
+                    },
                 },
                 tickets: {
                     create: tickets, // where tickets = [..., {ticketName, ticketNumber}]
@@ -25,6 +28,7 @@ export default async function handle(
 
         res.status(200).json(id)
     } catch (error) {
+        console.log(error)
         res.status(500).json({ error: 'Cant create new user' })
     }
 }
