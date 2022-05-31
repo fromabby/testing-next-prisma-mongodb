@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
+
+model Discord {
+    id       String  @id @default(auto()) @map("_id") @db.ObjectId
+    username String
+    tag      String
+    User     User?   @relation(fields: [userId], references: [id])
+    userId   String? @db.ObjectId
+}
+
+model User {
+    id      String    @id @default(auto()) @map("_id") @db.ObjectId
+    nearId  String    @unique
+    discord Discord[]
+    // username String
+    // tag      String
+    tickets Ticket[]
+    items   Item[]
+}
+
+model Ticket {
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
+    ticketName   String
+    ticketNumber Int
+    isMinted     Boolean
+    mintDate     DateTime
+    user         User?    @relation(fields: [userId], references: [id])
+    userId       String?
+}
+
+model Item {
+    id          String   @id @default(auto()) @map("_id") @db.ObjectId
+    shySkullId  String
+    rarity      Int
+    isAvailable Boolean
+    mintDate    DateTime
+    user        User?    @relation(fields: [userId], references: [id])
+    userId      String?
+}
