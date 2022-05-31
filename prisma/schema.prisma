@@ -20,34 +20,43 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Discord {
-    id       String @id @default(auto()) @map("_id") @db.ObjectId
-    username String
-    tag      String
-    user     User   @relation(fields: [userId], references: [id])
-    userId   String @unique @db.ObjectId
-}
-
+// relationship - a User can have:
+// one and ONLY one Discord (normalized?)
+// zero or many Ticket
+// zero or many Item
 model User {
     id      String   @id @default(auto()) @map("_id") @db.ObjectId
     nearId  String   @unique
-    discord Discord?
+    discord Discord
     // username String
     // tag      String
     tickets Ticket[]
     items   Item[]
+
+    @@map("user")
 }
 
+type Discord {
+    username String
+    tag      String
+}
+
+// relationship - a Ticket can have:
+// one and ONLY one User
 model Ticket {
     id           String    @id @default(auto()) @map("_id") @db.ObjectId
     ticketName   String
     ticketNumber Int
     isMinted     Boolean   @default(false)
     mintDate     DateTime?
-    user         User?     @relation(fields: [userId], references: [id])
-    userId       String?   @db.ObjectId
+    user         User      @relation(fields: [userId], references: [id])
+    userId       String    @db.ObjectId
+
+    @@map("ticket")
 }
 
+// relationship - an Item can have:
+// zero or ONE User
 model Item {
     id          String    @id @default(auto()) @map("_id") @db.ObjectId
     shySkullId  Int
@@ -56,4 +65,6 @@ model Item {
     mintDate    DateTime?
     user        User?     @relation(fields: [userId], references: [id])
     userId      String?   @db.ObjectId
+
+    @@map("item")
 }
