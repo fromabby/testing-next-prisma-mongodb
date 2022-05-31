@@ -44,8 +44,8 @@ const Home: NextPage = (props) => {
                         <>
                             <p>{user.id}</p>
                             <p>{user.nearId}</p>
-                            <p>{user.discord[0].username}</p>
-                            <p>{user.discord[0].tag}</p>
+                            <p>{user.discord.username}</p>
+                            <p>{user.discord.tag}</p>
                         </>
                     )}
                     <button onClick={getUser}>Get User</button>
