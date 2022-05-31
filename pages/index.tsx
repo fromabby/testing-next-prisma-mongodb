@@ -13,8 +13,9 @@ import { useState } from 'react'
 const Home: NextPage = (props) => {
     const [user, setUser] = useState({
         id: '',
-        nearId: '',
-        discord: [{ username: '', tag: '' }],
+        username: '',
+        tag: '',
+        user: { nearId: '' },
     })
 
     // const [user, setUser] = useState(props)
@@ -43,9 +44,9 @@ const Home: NextPage = (props) => {
                     {user && (
                         <>
                             <p>{user.id}</p>
-                            <p>{user.nearId}</p>
-                            <p>{user.discord.username}</p>
-                            <p>{user.discord.tag}</p>
+                            <p>{user.username}</p>
+                            <p>{user.tag}</p>
+                            <p>{user.user.nearId}</p>
                         </>
                     )}
                     <button onClick={getUser}>Get User</button>
