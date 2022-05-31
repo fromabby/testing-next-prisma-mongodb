@@ -8,10 +8,16 @@ export default async function handler(
 ) {
     const { id } = await prisma.user.create({
         data: {
-            nearId: 'abby',
+            nearId: 'IHaveATicket',
             discord: {
-                username: 'Myoui',
+                username: 'Unique12',
                 tag: '1234',
+            },
+            tickets: {
+                create: {
+                    ticketName: 'Mystery Ticket',
+                    ticketNumber: 1,
+                },
             },
         },
     })

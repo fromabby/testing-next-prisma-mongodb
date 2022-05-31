@@ -3,6 +3,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useState } from 'react'
+import axios from 'axios'
 
 // export const getServerSideProps: GetServerSideProps = async (context) => {
 //     const res = await fetch(`http://localhost:3000/api/hello`)
@@ -13,19 +14,42 @@ import { useState } from 'react'
 const Home: NextPage = (props) => {
     const [user, setUser] = useState({
         id: '',
-        username: '',
-        tag: '',
-        user: { nearId: '' },
+        nearId: '',
+        discord: { username: '', tag: '' },
     })
 
     // const [user, setUser] = useState(props)
 
+    const [users, setUsers] = useState([])
     const getUser = async () => {
-        const data = await (
-            await fetch('http://localhost:3000/api/hello')
-        ).json()
+        try {
+            const userId = '6295e451fbceed3afc0587fe'
+            const ticketId = '6295f4e923dedf500e3f122c'
+            const itemId = '6295fdae12b2ef36e2d0c4e3'
 
-        setUser(data)
+            // ! randomizer
+            // const { data } = await axios.get(
+            //     `http://localhost:3000/api/randomizer/${itemId}/${userId}/${ticketId}`
+            // )
+
+            // ! create item
+            // const { data } = await axios.post(
+            //     `http://localhost:3000/api/item/new`,
+            //     {
+            //         shySkullId: 3,
+            //         rarity: 'N36',
+            //     }
+            // )
+
+            // ! get available tickets
+            const { data } = await axios.get(
+                `http://localhost:3000/api/ticket/user/${userId}`
+            )
+
+            console.log(data)
+        } catch (error) {
+            window.alert('duplicate!')
+        }
     }
 
     return (
@@ -41,15 +65,24 @@ const Home: NextPage = (props) => {
 
             <main className={styles.main}>
                 <div>
-                    {user && (
+                    {/* {user && (
                         <>
                             <p>{user.id}</p>
-                            <p>{user.username}</p>
-                            <p>{user.tag}</p>
-                            <p>{user.user.nearId}</p>
+                            <p>{user.nearId}</p>
+                            <p>{user.discord.username}</p>
+                            <p>{user.discord.tag}</p>
                         </>
-                    )}
-                    <button onClick={getUser}>Get User</button>
+                    )} */}
+                    <select style={{ width: '100px' }} required>
+                        <option>-</option>
+                        {users &&
+                            users.map((user) => (
+                                <option key={user.id} value={user.id}>
+                                    {user.nearId}
+                                </option>
+                            ))}
+                    </select>
+                    <button onClick={getUser}>Get Users</button>
                 </div>
                 <h1 className={styles.title}>
                     Welcome to <a href='https://nextjs.org'>Next.js!</a>

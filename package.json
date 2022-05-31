@@ -1,36 +1,43 @@
 {
-  "name": "testing-next-prisma-mongodb",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "@prisma/client": "^3.14.0",
-    "next": "12.1.6",
-    "prisma-erd-generator": "^0.11.4",
-    "react": "18.1.0",
-    "react-dom": "18.1.0"
-  },
-  "devDependencies": {
-    "@types/node": "^17.0.36",
-    "@types/react": "18.0.9",
-    "@types/react-dom": "18.0.5",
-    "eslint": "8.16.0",
-    "eslint-config-next": "12.1.6",
-    "prisma": "^3.14.0",
-    "ts-node": "^10.8.0",
-    "typescript": "^4.7.2"
-  },
-  "description": "This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).",
-  "main": "next.config.js",
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "directories": {
-    "lib": "lib"
-  }
+    "name": "testing-next-prisma-mongodb",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "concurrently \"npm run db\" \"next dev\" --names prisma,next",
+        "dev-mode": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint",
+        "db": "npx prisma generate && npx prisma db push"
+    },
+    "dependencies": {
+        "@prisma/client": "^3.14.0",
+        "axios": "^0.27.2",
+        "concurrently": "^7.2.1",
+        "mdbreact": "^5.2.0",
+        "next": "12.1.6",
+        "prettier": "^2.6.2",
+        "prisma-erd-generator": "^0.11.4",
+        "react": "18.1.0",
+        "react-dom": "18.1.0",
+        "swr": "^1.3.0"
+    },
+    "devDependencies": {
+        "@types/node": "^17.0.36",
+        "@types/react": "18.0.9",
+        "@types/react-dom": "18.0.5",
+        "eslint": "8.16.0",
+        "eslint-config-next": "12.1.6",
+        "prisma": "^3.14.0",
+        "ts-node": "^10.8.0",
+        "typescript": "^4.7.2"
+    },
+    "description": "This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).",
+    "main": "next.config.js",
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "directories": {
+        "lib": "lib"
+    }
 }
