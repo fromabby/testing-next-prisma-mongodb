@@ -3,10 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '../../../lib/prisma'
 
 // GET ALL AVAILABLE ITEMS -> /api/item/available
-export default async function handle(
-    req: NextApiRequest,
-    res: NextApiResponse
-) {
+const handle = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
         const items = await prisma.item.findMany({
             where: {
@@ -19,3 +16,5 @@ export default async function handle(
         res.status(500).json({ error: 'Cannot get available items' })
     }
 }
+
+export default handle

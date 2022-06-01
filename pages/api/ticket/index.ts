@@ -3,10 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '../../../lib/prisma'
 
 // GET ALL TICKETS -> /api/ticket/
-export default async function handle(
-    req: NextApiRequest,
-    res: NextApiResponse
-) {
+const handle = async (_: NextApiRequest, res: NextApiResponse) => {
     try {
         const tickets = await prisma.user.findMany()
 
@@ -15,3 +12,5 @@ export default async function handle(
         res.status(500).json({ error: 'Cannot get all tickets' })
     }
 }
+
+export default handle

@@ -7,10 +7,7 @@ import next from 'next'
 // * (get random item -> check availability) -> (update item availability -> update user details -> update ticket details (minted)) -> display
 
 // RANDOMIZER -> /api/randomize/:item/:user/:ticket
-export default async function handle(
-    req: NextApiRequest,
-    res: NextApiResponse
-) {
+const handle = async (req: NextApiRequest, res: NextApiResponse) => {
     const itemId = String(req.query.item)
     const userId = String(req.query.user)
     const ticketId = String(req.query.ticket)
@@ -80,3 +77,5 @@ export default async function handle(
         res.status(500).json({ error: 'Cannot get all users' })
     }
 }
+
+export default handle

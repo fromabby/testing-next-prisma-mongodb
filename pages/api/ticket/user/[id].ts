@@ -3,10 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '../../../../lib/prisma'
 
 // GET AVAILABLE TICKETS OF USER -> /api/tickets/user/:id
-export default async function handle(
-    req: NextApiRequest,
-    res: NextApiResponse
-) {
+const handle = async (req: NextApiRequest, res: NextApiResponse) => {
     const userId = String(req.query.id)
 
     try {
@@ -23,3 +20,5 @@ export default async function handle(
         })
     }
 }
+
+export default handle
