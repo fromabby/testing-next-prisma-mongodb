@@ -17,54 +17,58 @@ export default async function handle(
 
     try {
         // * (get random item -> check availability of ticket and item)
-        const item = await prisma.item.findUnique({
-            where: {
-                id: itemId,
-            },
-        })
+        const isAvailable = await prisma.$transaction([
+            prisma.item.findFirst({
+                where: {
+                    id: itemId,
+                    isAvailable: true,
+                },
+            }),
+            prisma.ticket.findFirst({
+                where: {
+                    id: ticketId,
+                    isMinted: false,
+                },
+            }),
+        ])
 
-        const ticket = await prisma.ticket.findUnique({
-            where: {
-                id: ticketId,
-            },
-        })
-
-        if (!item?.isAvailable || ticket?.isMinted)
+        if (!isAvailable)
             return res.status(500).json({
                 error: `item ${itemId} or ticket ${ticketId} are not available`,
             })
 
         // * (update item availability -> update ticket details (minted))
-        await prisma.item.update({
-            where: {
-                id: itemId,
-            },
-            data: {
-                isAvailable: !item?.isAvailable,
-                mintDate: new Date(Date.now()),
-                userId,
-            },
-        })
+        const [item, ticket] = await prisma.$transaction([
+            prisma.item.update({
+                where: {
+                    id: itemId,
+                },
+                data: {
+                    isAvailable: false,
+                    mintDate: new Date(Date.now()),
+                    userId,
+                },
+            }),
+            prisma.ticket.update({
+                where: {
+                    id: ticketId,
+                },
+                data: {
+                    isMinted: true,
+                    mintDate: new Date(Date.now()),
+                    userId,
+                },
+            }),
+        ])
 
-        await prisma.ticket.update({
-            where: {
-                id: ticketId,
-            },
-            data: {
-                isMinted: !ticket?.isMinted,
-                mintDate: new Date(Date.now()),
-                userId,
-            },
-        })
+        if (!(item || ticket))
+            return res.status(500).json({
+                error: `could not update`,
+            })
 
         // * display user details
-
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            include: {
-                tickets: true,
-                items: true,
-            },
         })
 
         res.status(200).json({

@@ -17,6 +17,7 @@ const Home = ({ items: itemlist }: any) => {
     const [userId, setUserId] = useState('')
     const [ticketId, setTicketId] = useState('')
 
+    console.log('useSWR')
     const { data: ticketlist, isValidating: ticketsloading } = useSWR(
         `http://localhost:3000/api/ticket/user/${userId}`
     )
@@ -51,6 +52,10 @@ const Home = ({ items: itemlist }: any) => {
             isAvailable: false,
         },
     })
+
+    // useEffect(() => {
+    //     setTickets([])
+    // }, [userId])
 
     useEffect(() => {
         !usersloading && userlist && setUsers(userlist)
@@ -113,12 +118,14 @@ const Home = ({ items: itemlist }: any) => {
                         </select>
                     </a>
 
+                    {/* On initial load, ticket values are the users */}
                     <a className={styles.card}>
                         <h2>Select Ticket</h2>
                         <select
                             value={ticketId}
                             onChange={(e) => setTicketId(e.target.value)}
                             required={true}
+                            // disabled={userId === ''}
                         >
                             <option></option>
                             {!ticketsloading && (
